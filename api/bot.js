@@ -1,4 +1,4 @@
-const { Telegraf, Markup } = require('telegraf');
+const { Telegraf } = require('telegraf');
 const admin = require('firebase-admin');
 
 // Firebase-ni faollashtirish
@@ -26,38 +26,33 @@ bot.start(async (ctx) => {
         const isMember = ['creator', 'administrator', 'member'].includes(member.status);
 
         if (!isMember) {
-            return ctx.reply(`👋 Assalomu alaykum! Botdan foydalanish uchun kanalimizga obuna bo'ling:`, 
-                Markup.inlineKeyboard([
-                    [Markup.url.button("Obuna bo'lish", `https://t.me/${KANAL_USERNAME}`)],
-                    [Markup.callback.button("Tekshirish ✅", "check_sub")]
-                ])
-            );
+            return ctx.reply(`👋 Assalomu alaykum! Botdan foydalanish uchun kanalimizga obuna bo'ling:`, {
+                reply_markup: {
+                    inline_keyboard: [
+                        [{ text: "Obuna bo'lish", url: `https://t.me/${KANAL_USERNAME}` }],
+                        [{ text: "Tekshirish ✅", callback_data: "check_sub" }]
+                    ]
+                }
+            });
         }
 
-        // XATONI TUZATISH: Eng xavfsiz tugma yaratish usuli
-        return ctx.reply("Xush kelibsiz! Ro'yxatdan o'tish uchun telefon raqamingizni yuboring:", 
-            {
-                reply_markup: {
-                    keyboard: [
-                        [{ text: "📱 Kontaktni yuborish", request_contact: true }]
-                    ],
-                    resize_keyboard: true,
-                    one_time_keyboard: true
-                }
+        return ctx.reply("Xush kelibsiz! Ro'yxatdan o'tish uchun telefon raqamingizni yuboring:", {
+            reply_markup: {
+                keyboard: [[{ text: "📱 Kontaktni yuborish", request_contact: true }]],
+                resize_keyboard: true,
+                one_time_keyboard: true
             }
-        );
+        });
 
     } catch (e) {
-        // Kanal xatosi bo'lsa ham foydalanuvchiga raqam yuborishni taklif qilamiz
-        return ctx.reply("Telefon raqamingizni yuboring:", 
-            {
-                reply_markup: {
-                    keyboard: [[{ text: "📱 Kontaktni yuborish", request_contact: true }]],
-                    resize_keyboard: true,
-                    one_time_keyboard: true
-                }
+        // Kanalda xato bo'lsa ham kontakt tugmasini chiqaramiz
+        return ctx.reply("Telefon raqamingizni yuboring:", {
+            reply_markup: {
+                keyboard: [[{ text: "📱 Kontaktni yuborish", request_contact: true }]],
+                resize_keyboard: true,
+                one_time_keyboard: true
             }
-        );
+        });
     }
 });
 
@@ -66,7 +61,7 @@ bot.action('check_sub', async (ctx) => {
         const member = await ctx.telegram.getChatMember(KANAL_ID, ctx.from.id);
         if (['creator', 'administrator', 'member'].includes(member.status)) {
             await ctx.answerCbQuery("Rahmat! ✅");
-            return ctx.reply("Endi /start bosing.");
+            return ctx.reply("Endi qaytadan /start bosing.");
         } else {
             await ctx.answerCbQuery("Siz hali a'zo emassiz! ❌", { show_alert: true });
         }
@@ -81,6 +76,7 @@ bot.on('contact', async (ctx) => {
     const userName = ctx.from.first_name || "User";
 
     try {
+        // Firebase-ga saqlash
         await db.ref('users/' + userId).set({
             phone: phone,
             name: userName,
@@ -88,13 +84,17 @@ bot.on('contact', async (ctx) => {
             registeredAt: new Date().toISOString()
         });
 
-        return ctx.reply(`Tabriklaymiz, ${userName}! ✅\nSiz muvaffaqiyatli ro'yxatdan o'tdingiz.\n\nEndi saytimizga kirib o'z profilingizni ulashingiz mumkin:\nhttps://deziy.vercel.app`,
-            Markup.inlineKeyboard([
-                [Markup.url.button("Saytga o'tish", "https://deziy.vercel.app")]
-            ])
-        );
+        // Muvaffaqiyatli saqlangandan keyin javob berish
+        return ctx.reply(`Tabriklaymiz, ${userName}! ✅\nSiz muvaffaqiyatli ro'yxatdan o'tdingiz.\n\nEndi saytimizga kirib profilingizni ulashingiz mumkin:\nhttps://deziy.vercel.app`, {
+            reply_markup: {
+                inline_keyboard: [
+                    [{ text: "Saytga o'tish", url: "https://deziy.vercel.app" }]
+                ]
+            }
+        });
     } catch (err) {
-        return ctx.reply("Bazaga saqlashda xato: " + err.message);
+        console.error("Firebase save error:", err);
+        return ctx.reply("Ma'lumotlarni saqlashda xato: " + err.message);
     }
 });
 
