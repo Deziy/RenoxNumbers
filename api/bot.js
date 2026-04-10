@@ -17,7 +17,9 @@ if (!admin.apps.length) {
 const db = admin.database();
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
+// Raqamli ID ishlatilganda, havolada username ishlatishimiz kerak
 const KANAL_ID = "-1003719846603"; 
+const KANAL_LINK = "RenoxNumbers"; // Kanal yuzerini buni ichiga @ siz yozing
 
 bot.start(async (ctx) => {
     try {
@@ -27,26 +29,37 @@ bot.start(async (ctx) => {
         if (!isAdminOrMember) {
             return ctx.reply(`👋 Assalomu alaykum! Botdan foydalanish uchun kanalimizga obuna bo'ling:`, 
                 Markup.inlineKeyboard([
-                    [Markup.url.button("Obuna bo'lish", `https://t.me/${KANAL_ID.replace('@', '')}`)],
+                    [Markup.url.button("Obuna bo'lish", `https://t.me/${KANAL_LINK}`)],
                     [Markup.callback.button("Tekshirish ✅", "check_sub")]
                 ])
             );
         }
 
-        // BU YERDA XATO BOR EDI: Markup.button.contact ishlatamiz
         return ctx.reply("Xush kelibsiz! Ro'yxatdan o'tish uchun telefon raqamingizni yuboring:", 
             Markup.keyboard([
-                [Markup.button.contact("📱 Kontaktni yuborish")]
+                [Markup.button.contactRequest("📱 Kontaktni yuborish")]
             ]).resize().oneTime()
         );
     } catch (e) {
-        return ctx.reply("Xatolik: Kanalni topa olmadim yoki bot kanalda admin emas.");
+        console.error(e);
+        return ctx.reply("Xatolik: Bot kanalda admin emas yoki ID noto'g'ri.");
     }
 });
 
 bot.action('check_sub', async (ctx) => {
-    await ctx.answerCbQuery();
-    return ctx.reply("Obunani tekshirish uchun qaytadan /start bosing.");
+    try {
+        const member = await ctx.telegram.getChatMember(KANAL_ID, ctx.from.id);
+        const isAdminOrMember = ['creator', 'administrator', 'member'].includes(member.status);
+
+        if (isAdminOrMember) {
+            await ctx.answerCbQuery("Rahmat! ✅");
+            return ctx.reply("Tabriklaymiz! Endi /start bosing.");
+        } else {
+            await ctx.answerCbQuery("Siz hali a'zo bo'lmadingiz! ❌", { show_alert: true });
+        }
+    } catch (e) {
+        await ctx.answerCbQuery("Xatolik yuz berdi.");
+    }
 });
 
 bot.on('contact', async (ctx) => {
@@ -68,7 +81,7 @@ bot.on('contact', async (ctx) => {
             ])
         );
     } catch (err) {
-        return ctx.reply("Ma'lumotlarni saqlashda xatolik yuz berdi: " + err.message);
+        return ctx.reply("Ma'lumotlarni saqlashda xatolik: " + err.message);
     }
 });
 
