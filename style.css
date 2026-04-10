@@ -1,0 +1,94 @@
+:root {
+    --primary: #6366f1;
+    --accent: #a855f7;
+    --bg: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --text: #f8fafc;
+    --success: #10b981;
+    --danger: #ef4444;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+    background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+    color: var(--text);
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    font-family: 'Inter', sans-serif;
+}
+
+.glass-container {
+    width: 100%;
+    max-width: 1000px;
+    background: var(--card-bg);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+h1 { font-size: 1.6rem; cursor: pointer; user-select: none; margin: 0; }
+.accent { color: var(--primary); font-weight: 800; }
+
+.admin-badge {
+    display: none; background: var(--danger); color: white;
+    padding: 4px 10px; border-radius: 50px; font-size: 0.7rem;
+    font-weight: bold; text-transform: uppercase;
+}
+
+.admin-section { display: none; margin-bottom: 25px; }
+.form-card { background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 12px; border: 1px dashed var(--primary); }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+
+input, select {
+    background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255,255,255,0.1);
+    padding: 10px; border-radius: 8px; color: white; font-size: 0.9rem;
+}
+
+.btn-primary { background: var(--primary); border: none; color: white; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+.table-wrapper { width: 100%; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; padding: 12px; border-bottom: 2px solid rgba(255,255,255,0.05); color: #94a3b8; font-size: 0.85rem; }
+td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.9rem; }
+
+.badge { padding: 4px 8px; border-radius: 5px; font-size: 0.75rem; font-weight: 600; }
+.spamsiz { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+.spam { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+.price-tag { color: #38bdf8; font-weight: 700; white-space: nowrap; }
+
+.buy-btn {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    color: white; text-decoration: none; padding: 7px 14px;
+    border-radius: 6px; font-size: 0.8rem; font-weight: 600;
+    display: inline-block; transition: 0.2s; text-align: center;
+}
+
+.footer-bot { margin-top: 20px; color: #64748b; font-size: 0.8rem; }
+
+@media (max-width: 650px) {
+    thead { display: none; }
+    tr {
+        display: block; background: rgba(255, 255, 255, 0.03);
+        margin-bottom: 15px; padding: 15px; border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    td {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+    }
+    td:last-child { border-bottom: none; }
+    td:nth-child(1)::before { content: "Davlat:"; color: #94a3b8; }
+    td:nth-child(2)::before { content: "Raqam:"; color: #94a3b8; }
+    td:nth-child(3)::before { content: "Holati:"; color: #94a3b8; }
+    td:nth-child(4)::before { content: "Narxi:"; color: #94a3b8; }
+    td:nth-child(5) { display: block; border: none; padding-top: 15px; }
+    .buy-btn { width: 100%; padding: 12px; font-size: 1rem; }
+}
