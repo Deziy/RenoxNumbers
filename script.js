@@ -1,94 +1,99 @@
-:root {
-    --primary: #6366f1;
-    --accent: #a855f7;
-    --bg: #0f172a;
-    --card-bg: rgba(30, 41, 59, 0.7);
-    --text: #f8fafc;
-    --success: #10b981;
-    --danger: #ef4444;
-}
+const firebaseConfig = {
+    apiKey: "AIzaSyCZF_eOPSNYlgD5gUGWO7yOdcRSRIhUzt4",
+    authDomain: "nomer-865c9.firebaseapp.com",
+    databaseURL: "https://nomer-865c9-default-rtdb.firebaseio.com",
+    projectId: "nomer-865c9",
+    storageBucket: "nomer-865c9.firebasestorage.app",
+    messagingSenderId: "618335821322",
+    appId: "1:618335821322:web:fee270b12c36df1e2049f3",
+    measurementId: "G-7Z523WYG9S"
+};
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-body {
-    background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
-    color: var(--text);
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px;
-    font-family: 'Inter', sans-serif;
-}
+let isAdmin = false;
+let currentEditId = null;
+let tapCount = 0;
+let tapTimer;
 
-.glass-container {
-    width: 100%;
-    max-width: 1000px;
-    background: var(--card-bg);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-}
-
-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-h1 { font-size: 1.6rem; cursor: pointer; user-select: none; margin: 0; }
-.accent { color: var(--primary); font-weight: 800; }
-
-.admin-badge {
-    display: none; background: var(--danger); color: white;
-    padding: 4px 10px; border-radius: 50px; font-size: 0.7rem;
-    font-weight: bold; text-transform: uppercase;
-}
-
-.admin-section { display: none; margin-bottom: 25px; }
-.form-card { background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 12px; border: 1px dashed var(--primary); }
-.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
-
-input, select {
-    background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255,255,255,0.1);
-    padding: 10px; border-radius: 8px; color: white; font-size: 0.9rem;
-}
-
-.btn-primary { background: var(--primary); border: none; color: white; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-
-.table-wrapper { width: 100%; }
-table { width: 100%; border-collapse: collapse; }
-th { text-align: left; padding: 12px; border-bottom: 2px solid rgba(255,255,255,0.05); color: #94a3b8; font-size: 0.85rem; }
-td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.9rem; }
-
-.badge { padding: 4px 8px; border-radius: 5px; font-size: 0.75rem; font-weight: 600; }
-.spamsiz { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-.spam { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-.price-tag { color: #38bdf8; font-weight: 700; white-space: nowrap; }
-
-.buy-btn {
-    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-    color: white; text-decoration: none; padding: 7px 14px;
-    border-radius: 6px; font-size: 0.8rem; font-weight: 600;
-    display: inline-block; transition: 0.2s; text-align: center;
-}
-
-.footer-bot { margin-top: 20px; color: #64748b; font-size: 0.8rem; }
-
-@media (max-width: 650px) {
-    thead { display: none; }
-    tr {
-        display: block; background: rgba(255, 255, 255, 0.03);
-        margin-bottom: 15px; padding: 15px; border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.05);
+function secretAdminTap() {
+    tapCount++;
+    clearTimeout(tapTimer);
+    tapTimer = setTimeout(() => { tapCount = 0; }, 2000);
+    if (tapCount >= 5) {
+        tapCount = 0;
+        const pass = prompt("Admin parolini kiriting:");
+        if (pass === "renox2026") {
+            isAdmin = true;
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('adminIndicator').style.display = 'block';
+            renderTable();
+        }
     }
-    td {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-    }
-    td:last-child { border-bottom: none; }
-    td:nth-child(1)::before { content: "Davlat:"; color: #94a3b8; }
-    td:nth-child(2)::before { content: "Raqam:"; color: #94a3b8; }
-    td:nth-child(3)::before { content: "Holati:"; color: #94a3b8; }
-    td:nth-child(4)::before { content: "Narxi:"; color: #94a3b8; }
-    td:nth-child(5) { display: block; border: none; padding-top: 15px; }
-    .buy-btn { width: 100%; padding: 12px; font-size: 1rem; }
 }
+
+function handleAction() {
+    const country = document.getElementById('country').value;
+    const phone = document.getElementById('phone').value;
+    const price = document.getElementById('price').value;
+    const status = document.getElementById('status').value;
+    if (!country || !phone || !price) return alert("Barcha maydonlarni to'ldiring!");
+    const data = { country, phone, price, status };
+    if (currentEditId) {
+        db.ref('numbers/' + currentEditId).update(data);
+        currentEditId = null;
+        document.getElementById('actionBtn').innerText = "Saqlash";
+    } else {
+        db.ref('numbers').push(data);
+    }
+    document.getElementById('country').value = '';
+    document.getElementById('phone').value = '';
+    document.getElementById('price').value = '';
+}
+
+function deleteData(id) { if (confirm("O'chirilsinmi?")) db.ref('numbers/' + id).remove(); }
+
+function editData(id, c, p, pr, s) {
+    document.getElementById('country').value = c;
+    document.getElementById('phone').value = p;
+    document.getElementById('price').value = pr;
+    document.getElementById('status').value = s;
+    currentEditId = id;
+    document.getElementById('actionBtn').innerText = "Yangilash";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderTable() {
+    db.ref('numbers').on('value', (snapshot) => {
+        const tbody = document.getElementById('dataTable');
+        tbody.innerHTML = '';
+        snapshot.forEach((child) => {
+            const v = child.val();
+            const id = child.key;
+            const sClass = v.status === "Spamsiz" ? "spamsiz" : "spam";
+            
+            // SIZ AYTGANINGIZDEK TAYYOR XABAR MATNI
+            const textContent = `👋 Assalomu alaykum, yaxshimisiz\n\nMen ${v.country} raqamini sotib olmoqchi edim. Uning narxi ${v.price} so'm ekan\n\nTo'lov qilishim uchun karta raqamingizni yubora olasizmi?`;
+            
+            const msg = encodeURIComponent(textContent);
+            const telLink = `https://t.me/iCrazyKing?text=${msg}`;
+            
+            let row = `
+                <tr>
+                    <td><strong>${v.country}</strong></td>
+                    <td>${v.phone}</td>
+                    <td><span class="badge ${sClass}">${v.status}</span></td>
+                    <td class="price-tag">${v.price} UZS</td>
+                    <td><a href="${telLink}" class="buy-btn" target="_blank">Sotib olish</a></td>
+                    ${isAdmin ? `
+                        <td class="admin-only" style="display:table-cell">
+                            <button style="color:#fbbf24; background:none; border:none; cursor:pointer;" onclick="editData('${id}', '${v.country}', '${v.phone}', '${v.price}', '${v.status}')">✏️</button>
+                            <button style="color:#ef4444; background:none; border:none; cursor:pointer;" onclick="deleteData('${id}')">🗑️</button>
+                        </td>` : ''}
+                </tr>`;
+            tbody.innerHTML += row;
+        });
+    });
+}
+renderTable();
