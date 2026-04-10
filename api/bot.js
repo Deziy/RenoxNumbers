@@ -17,7 +17,7 @@ if (!admin.apps.length) {
 const db = admin.database();
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-const KANAL_ID = "@RenoxNumbers"; 
+const KANAL_ID = "-1003719846603"; 
 
 bot.start(async (ctx) => {
     try {
