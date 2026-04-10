@@ -17,15 +17,13 @@ if (!admin.apps.length) {
 const db = admin.database();
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-// MUHIM: Raqamli ID va Kanal linkini alohida yozamiz
 const KANAL_ID = "-1003719846603"; 
 const KANAL_USERNAME = "RenoxNumbers"; 
 
 bot.start(async (ctx) => {
     try {
         const member = await ctx.telegram.getChatMember(KANAL_ID, ctx.from.id);
-        const status = member.status;
-        const isMember = ['creator', 'administrator', 'member'].includes(status);
+        const isMember = ['creator', 'administrator', 'member'].includes(member.status);
 
         if (!isMember) {
             return ctx.reply(`👋 Assalomu alaykum! Botdan foydalanish uchun kanalimizga obuna bo'ling:`, 
@@ -36,29 +34,41 @@ bot.start(async (ctx) => {
             );
         }
 
-        // XATO SHU YERDA EDI: To'g'ri yozilishi pastdagidek:
+        // XATONI TUZATISH: Eng xavfsiz tugma yaratish usuli
         return ctx.reply("Xush kelibsiz! Ro'yxatdan o'tish uchun telefon raqamingizni yuboring:", 
-            Markup.keyboard([
-                [Markup.button.contact("📱 Kontaktni yuborish")]
-            ]).resize().oneTime()
+            {
+                reply_markup: {
+                    keyboard: [
+                        [{ text: "📱 Kontaktni yuborish", request_contact: true }]
+                    ],
+                    resize_keyboard: true,
+                    one_time_keyboard: true
+                }
+            }
         );
 
     } catch (e) {
-        console.error("Start error:", e);
-        return ctx.reply("Xatolik: Bot kanalni topa olmayapti. Iltimos, bot @RenoxNumbers kanalida admin ekanligini tekshiring.");
+        // Kanal xatosi bo'lsa ham foydalanuvchiga raqam yuborishni taklif qilamiz
+        return ctx.reply("Telefon raqamingizni yuboring:", 
+            {
+                reply_markup: {
+                    keyboard: [[{ text: "📱 Kontaktni yuborish", request_contact: true }]],
+                    resize_keyboard: true,
+                    one_time_keyboard: true
+                }
+            }
+        );
     }
 });
 
 bot.action('check_sub', async (ctx) => {
     try {
         const member = await ctx.telegram.getChatMember(KANAL_ID, ctx.from.id);
-        const isMember = ['creator', 'administrator', 'member'].includes(member.status);
-        
-        if (isMember) {
+        if (['creator', 'administrator', 'member'].includes(member.status)) {
             await ctx.answerCbQuery("Rahmat! ✅");
-            return ctx.reply("Tabriklaymiz! Endi /start buyrug'ini yozing.");
+            return ctx.reply("Endi /start bosing.");
         } else {
-            await ctx.answerCbQuery("Siz hali kanalga a'zo emassiz! ❌", { show_alert: true });
+            await ctx.answerCbQuery("Siz hali a'zo emassiz! ❌", { show_alert: true });
         }
     } catch (e) {
         await ctx.answerCbQuery("Xatolik yuz berdi.");
@@ -84,8 +94,7 @@ bot.on('contact', async (ctx) => {
             ])
         );
     } catch (err) {
-        console.error("DB error:", err);
-        return ctx.reply("Ma'lumotlarni saqlashda xatolik: " + err.message);
+        return ctx.reply("Bazaga saqlashda xato: " + err.message);
     }
 });
 
