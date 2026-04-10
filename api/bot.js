@@ -3,18 +3,25 @@ const admin = require('firebase-admin');
 
 // Firebase-ni faollashtirish
 if (!admin.apps.length) {
-    admin.initializeApp({
-        credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)),
-        databaseURL: "https://nomer-865c9-default-rtdb.firebaseio.com"
-    });
+    try {
+        const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+            databaseURL: "https://nomer-865c9-default-rtdb.firebaseio.com"
+        });
+    } catch (error) {
+        console.error("Firebase init error:", error);
+    }
 }
+
 const db = admin.database();
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-const KANAL_ID = "@RenoxNumbers"; // O'zingizning kanalingiz yuzerini shu yerga yozing
+const KANAL_ID = "@RenoxNumbers"; // Kanalingiz yuzeri to'g'riligini tekshiring
 
 bot.start(async (ctx) => {
     try {
+        // Kanalga a'zolikni tekshirish
         const member = await ctx.telegram.getChatMember(KANAL_ID, ctx.from.id);
         const isAdminOrMember = ['creator', 'administrator', 'member'].includes(member.status);
 
@@ -33,25 +40,23 @@ bot.start(async (ctx) => {
             ]).resize().oneTime()
         );
     } catch (e) {
+        console.error("Start error:", e);
         return ctx.reply("Xatolik: Kanalni topa olmadim yoki bot kanalda admin emas.");
     }
 });
 
-// "Tekshirish" tugmasi bosilganda
 bot.action('check_sub', async (ctx) => {
     await ctx.answerCbQuery();
-    await ctx.reply("Tekshirilmoqda...");
-    // Qayta start buyrug'ini yuborganidek ishlaydi
-    return ctx.reply("Tekshirish uchun qaytadan /start bosing.");
+    return ctx.reply("Obunani tekshirish uchun qaytadan /start bosing.");
 });
 
 bot.on('contact', async (ctx) => {
     const phone = ctx.message.contact.phone_number;
     const userId = ctx.from.id;
-    const userName = ctx.from.first_name;
+    const userName = ctx.from.first_name || "User";
 
     try {
-        // Firebase-ga foydalanuvchini saqlash
+        // Foydalanuvchini bazaga saqlash
         await db.ref('users/' + userId).set({
             phone: phone,
             name: userName,
@@ -65,16 +70,19 @@ bot.on('contact', async (ctx) => {
             ])
         );
     } catch (err) {
-        return ctx.reply("Ma'lumotlarni saqlashda xatolik yuz berdi.");
+        console.error("Database save error:", err);
+        return ctx.reply("Ma'lumotlarni saqlashda xatolik yuz berdi: " + err.message);
     }
 });
 
+// Vercel Serverless Function export
 module.exports = async (req, res) => {
     if (req.method === 'POST') {
         try {
             await bot.handleUpdate(req.body);
             res.status(200).send('OK');
         } catch (err) {
+            console.error("Webhook error:", err);
             res.status(500).send('Error');
         }
     } else {
