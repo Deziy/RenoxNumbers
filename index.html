@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Renox Numbers | Liquid Shop</title>
+    <title>Renox Numbers | Premium Shop</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -23,9 +23,10 @@
             <h1>Virtual Raqamlar Olami</h1>
             <p>Telegram va boshqa xizmatlar uchun spamsiz raqamlar</p>
         </section>
-
+        
         <div id="numbersGrid" class="numbers-grid">
-            </div>
+            <div class="loading">Raqamlar yuklanmoqda...</div>
+        </div>
     </main>
 
     <div id="profileModal" class="modal">
@@ -34,15 +35,14 @@
                 <h2>Kirish</h2>
                 <p>Botga yuborgan raqamingizni kiriting:</p>
                 <input type="text" id="userPhoneInput" placeholder="+998901234567" class="glass-input">
-                <button class="action-btn" onclick="loginUser()">Tasdiqlash</button>
+                <button class="action-btn" onclick="loginUser()">Kirish</button>
             </div>
 
             <div id="profileSection" style="display: none;">
-                <h2 id="welcomeUser">Xush kelibsiz!</h2>
+                <h2 id="welcomeUser">Salom!</h2>
                 <div class="promo-card">
                     <h3>🎁 Mening Promokodlarim</h3>
-                    <div id="promoList" class="promo-list">
-                        </div>
+                    <div id="promoList" class="promo-list"></div>
                 </div>
                 <button class="danger-btn" onclick="logout()">Chiqish</button>
             </div>
