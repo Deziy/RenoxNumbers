@@ -17,11 +17,10 @@ if (!admin.apps.length) {
 const db = admin.database();
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-const KANAL_ID = "@RenoxNumbers"; // Kanalingiz yuzeri to'g'riligini tekshiring
+const KANAL_ID = "@RenoxNumbers"; 
 
 bot.start(async (ctx) => {
     try {
-        // Kanalga a'zolikni tekshirish
         const member = await ctx.telegram.getChatMember(KANAL_ID, ctx.from.id);
         const isAdminOrMember = ['creator', 'administrator', 'member'].includes(member.status);
 
@@ -34,13 +33,13 @@ bot.start(async (ctx) => {
             );
         }
 
+        // BU YERDA XATO BOR EDI: Markup.button.contact ishlatamiz
         return ctx.reply("Xush kelibsiz! Ro'yxatdan o'tish uchun telefon raqamingizni yuboring:", 
             Markup.keyboard([
-                [Markup.button.contactRequest("📱 Kontaktni yuborish")]
+                [Markup.button.contact("📱 Kontaktni yuborish")]
             ]).resize().oneTime()
         );
     } catch (e) {
-        console.error("Start error:", e);
         return ctx.reply("Xatolik: Kanalni topa olmadim yoki bot kanalda admin emas.");
     }
 });
@@ -56,7 +55,6 @@ bot.on('contact', async (ctx) => {
     const userName = ctx.from.first_name || "User";
 
     try {
-        // Foydalanuvchini bazaga saqlash
         await db.ref('users/' + userId).set({
             phone: phone,
             name: userName,
@@ -70,19 +68,16 @@ bot.on('contact', async (ctx) => {
             ])
         );
     } catch (err) {
-        console.error("Database save error:", err);
         return ctx.reply("Ma'lumotlarni saqlashda xatolik yuz berdi: " + err.message);
     }
 });
 
-// Vercel Serverless Function export
 module.exports = async (req, res) => {
     if (req.method === 'POST') {
         try {
             await bot.handleUpdate(req.body);
             res.status(200).send('OK');
         } catch (err) {
-            console.error("Webhook error:", err);
             res.status(500).send('Error');
         }
     } else {
