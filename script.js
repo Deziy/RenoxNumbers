@@ -4,21 +4,43 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// Profilni ochish/yopish
+// 1. Raqamlarni Firebase'dan yuklash
+function loadNumbers() {
+    const grid = document.getElementById('numbersGrid');
+    
+    // 'inventory' papkasini eshitamiz
+    db.ref('inventory').on('value', (snapshot) => {
+        grid.innerHTML = '';
+        if (snapshot.exists()) {
+            snapshot.forEach(child => {
+                const item = child.val();
+                grid.innerHTML += `
+                    <div class="number-card">
+                        <div style="font-size: 2rem;">🌍</div>
+                        <h3>${item.phone}</h3>
+                        <p class="price">${item.price} UZS</p>
+                        <p style="color: #aaa; margin-bottom: 15px;">Holati: ${item.status || 'Sotuvda'}</p>
+                        <button class="action-btn" onclick="buyNumber('${child.key}')">Sotib olish</button>
+                    </div>`;
+            });
+        } else {
+            grid.innerHTML = '<p>Hozircha raqamlar yo\'q. Firebase-ga "inventory" papkasi orqali qo\'shing.</p>';
+        }
+    });
+}
+
+// 2. Profil va Kirish
 function toggleProfile() {
     const modal = document.getElementById('profileModal');
     modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
 }
 
-// Kirish funksiyasi
 function loginUser() {
     const phone = document.getElementById('userPhoneInput').value.trim();
-    
     db.ref('users').orderByChild('phone').equalTo(phone).once('value', (snapshot) => {
         if (snapshot.exists()) {
             let userData;
-            snapshot.forEach(child => { userData = child.val(); });
-            
+            snapshot.forEach(c => { userData = c.val(); });
             localStorage.setItem('renox_user', JSON.stringify(userData));
             updateUI(userData);
         } else {
@@ -27,44 +49,42 @@ function loginUser() {
     });
 }
 
-// UI yangilash
 function updateUI(user) {
     document.getElementById('authSection').style.display = 'none';
     document.getElementById('profileSection').style.display = 'block';
     document.getElementById('welcomeUser').innerText = "Salom, " + user.name;
-    
     loadPromos(user.userId);
 }
 
-// Promokodlarni yuklash
 function loadPromos(userId) {
     const promoList = document.getElementById('promoList');
-    promoList.innerHTML = '';
-
     db.ref('promos/' + userId).on('value', (snapshot) => {
+        promoList.innerHTML = '';
         if (snapshot.exists()) {
             snapshot.forEach(child => {
-                const promo = child.val();
-                promoList.innerHTML += `
-                    <div class="promo-item">
-                        <span>${promo.code}</span>
-                        <span>-${promo.discount}%</span>
-                    </div>`;
+                const p = child.val();
+                promoList.innerHTML += `<div style="background: white; color: black; padding: 10px; border-radius: 8px; margin: 5px 0;">
+                    <b>${p.code}</b> - ${p.discount}% chegirma
+                </div>`;
             });
         } else {
-            promoList.innerHTML = '<p>Hozircha promokodlar yo\'q</p>';
+            promoList.innerHTML = '<p>Promokodlar mavjud emas</p>';
         }
     });
 }
 
-// Chiqish
 function logout() {
     localStorage.removeItem('renox_user');
     location.reload();
 }
 
-// Sahifa yuklanganda sessiyani tekshirish
+// 3. Sotib olish (oddiy xabar)
+function buyNumber(key) {
+    alert("Sotib olish uchun adminga murojaat qiling: @RenoxNumbersAdmin");
+}
+
 window.onload = () => {
+    loadNumbers();
     const savedUser = localStorage.getItem('renox_user');
     if (savedUser) updateUI(JSON.parse(savedUser));
 };
