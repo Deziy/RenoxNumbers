@@ -14,84 +14,40 @@ body {
     padding: 10px;
 }
 
-.glass-container {
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-header {
-    text-align: center;
-    padding: 20px 0;
-}
-
+header { text-align: center; padding: 20px 0; }
 .accent { color: var(--primary); }
 
 .admin-badge {
     display: none;
     background: #4cd137;
-    padding: 5px 10px;
+    padding: 5px 12px;
     border-radius: 20px;
     font-size: 12px;
-    width: fit-content;
     margin: 10px auto;
 }
 
-/* Admin Panel Dizayni */
-.admin-section {
-    display: none;
-    margin-bottom: 20px;
-}
-
+/* Admin Panel */
+.admin-section { display: none; margin-bottom: 20px; }
 .form-card {
     background: var(--card);
     padding: 20px;
     border-radius: 15px;
     border: 1px solid var(--border);
 }
-
 .form-grid {
-    display: grid;
-    gap: 10px;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    display: grid; gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
 }
 
-input, select {
-    background: #2d2d35;
-    border: 1px solid var(--border);
-    color: white;
-    padding: 10px;
-    border-radius: 8px;
-}
-
-.btn-primary {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-/* Jadval Dizayni */
+/* Jadval va Kartochkalar */
 .table-wrapper {
     background: var(--card);
     border-radius: 15px;
     overflow: hidden;
     border: 1px solid var(--border);
 }
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th, td {
-    padding: 15px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-}
-
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border); }
 th { background: #25252d; color: #888; font-size: 14px; }
 
 .buy-btn {
@@ -99,19 +55,20 @@ th { background: #25252d; color: #888; font-size: 14px; }
     color: white;
     border: none;
     padding: 8px 16px;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
+    font-weight: 600;
 }
 
-/* --- MOBIL MOSLASHUV (MEDIA QUERY) --- */
+/* --- MOBIL MOSLASHUV (Media Queries) --- */
 @media screen and (max-width: 650px) {
     table, thead, tbody, th, td, tr { display: block; }
-    
     thead tr { display: none; } /* Sarlavhalarni yashiramiz */
 
     tr {
-        border-bottom: 5px solid var(--bg);
+        border-bottom: 8px solid var(--bg);
         padding: 15px;
+        background: var(--card);
     }
 
     td {
@@ -122,7 +79,7 @@ th { background: #25252d; color: #888; font-size: 14px; }
         border: none;
     }
 
-    /* data-label orqali sarlavha qo'shamiz */
+    /* data-label orqali mobil sarlavhalarni chiqaramiz */
     td::before {
         content: attr(data-label);
         font-weight: bold;
@@ -131,7 +88,7 @@ th { background: #25252d; color: #888; font-size: 14px; }
     }
 
     /* Sotib olish tugmasini pastga tushirish */
-    td[data-label="Sotib olish"], td:nth-last-child(2) {
+    td[data-label="Amal"] {
         display: block;
         margin-top: 10px;
     }
