@@ -17,45 +17,48 @@ if (!admin.apps.length) {
 const db = admin.database();
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-// Raqamli ID ishlatilganda, havolada username ishlatishimiz kerak
+// MUHIM: Raqamli ID va Kanal linkini alohida yozamiz
 const KANAL_ID = "-1003719846603"; 
-const KANAL_LINK = "RenoxNumbers"; // Kanal yuzerini buni ichiga @ siz yozing
+const KANAL_USERNAME = "RenoxNumbers"; 
 
 bot.start(async (ctx) => {
     try {
         const member = await ctx.telegram.getChatMember(KANAL_ID, ctx.from.id);
-        const isAdminOrMember = ['creator', 'administrator', 'member'].includes(member.status);
+        const status = member.status;
+        const isMember = ['creator', 'administrator', 'member'].includes(status);
 
-        if (!isAdminOrMember) {
+        if (!isMember) {
             return ctx.reply(`👋 Assalomu alaykum! Botdan foydalanish uchun kanalimizga obuna bo'ling:`, 
                 Markup.inlineKeyboard([
-                    [Markup.url.button("Obuna bo'lish", `https://t.me/${KANAL_LINK}`)],
+                    [Markup.url.button("Obuna bo'lish", `https://t.me/${KANAL_USERNAME}`)],
                     [Markup.callback.button("Tekshirish ✅", "check_sub")]
                 ])
             );
         }
 
+        // XATO SHU YERDA EDI: To'g'ri yozilishi pastdagidek:
         return ctx.reply("Xush kelibsiz! Ro'yxatdan o'tish uchun telefon raqamingizni yuboring:", 
             Markup.keyboard([
-                [Markup.button.contactRequest("📱 Kontaktni yuborish")]
+                [Markup.button.contact("📱 Kontaktni yuborish")]
             ]).resize().oneTime()
         );
+
     } catch (e) {
-        console.error(e);
-        return ctx.reply("Xatolik: Bot kanalda admin emas yoki ID noto'g'ri.");
+        console.error("Start error:", e);
+        return ctx.reply("Xatolik: Bot kanalni topa olmayapti. Iltimos, bot @RenoxNumbers kanalida admin ekanligini tekshiring.");
     }
 });
 
 bot.action('check_sub', async (ctx) => {
     try {
         const member = await ctx.telegram.getChatMember(KANAL_ID, ctx.from.id);
-        const isAdminOrMember = ['creator', 'administrator', 'member'].includes(member.status);
-
-        if (isAdminOrMember) {
+        const isMember = ['creator', 'administrator', 'member'].includes(member.status);
+        
+        if (isMember) {
             await ctx.answerCbQuery("Rahmat! ✅");
-            return ctx.reply("Tabriklaymiz! Endi /start bosing.");
+            return ctx.reply("Tabriklaymiz! Endi /start buyrug'ini yozing.");
         } else {
-            await ctx.answerCbQuery("Siz hali a'zo bo'lmadingiz! ❌", { show_alert: true });
+            await ctx.answerCbQuery("Siz hali kanalga a'zo emassiz! ❌", { show_alert: true });
         }
     } catch (e) {
         await ctx.answerCbQuery("Xatolik yuz berdi.");
@@ -81,6 +84,7 @@ bot.on('contact', async (ctx) => {
             ])
         );
     } catch (err) {
+        console.error("DB error:", err);
         return ctx.reply("Ma'lumotlarni saqlashda xatolik: " + err.message);
     }
 });
