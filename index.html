@@ -2,56 +2,54 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Renox Numbers | Global Shop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renox Numbers | Liquid Shop</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
 <body>
-
-<div class="glass-container">
-    <header>
-        <h1 id="logo" onclick="secretAdminTap()">Renox <span class="accent">Numbers</span></h1>
-        <div id="adminIndicator" class="admin-badge">Admin Mode Active</div>
+    <div class="liquid-bg"></div>
+    
+    <header class="glass-header">
+        <div class="logo">Renox<span>Numbers</span></div>
+        <div class="auth-controls">
+            <button id="profileBtn" class="glass-btn" onclick="toggleProfile()">👤 Profil</button>
+        </div>
     </header>
 
-    <section id="adminPanel" class="admin-section">
-        <div class="form-card">
-            <h3>Boshqaruv Paneli</h3>
-            <div class="form-grid">
-                <input type="text" id="country" placeholder="Davlat nomi">
-                <input type="text" id="phone" placeholder="Telefon raqam">
-                <input type="text" id="price" placeholder="Narxi (masalan: 15,000)">
-                <select id="status">
-                    <option value="Spamsiz">Spamsiz</option>
-                    <option value="Spam">Spam</option>
-                </select>
-                <button class="btn-primary" id="actionBtn" onclick="handleAction()">Saqlash</button>
+    <main class="container">
+        <section class="hero">
+            <h1>Virtual Raqamlar Olami</h1>
+            <p>Telegram va boshqa xizmatlar uchun spamsiz raqamlar</p>
+        </section>
+
+        <div id="numbersGrid" class="numbers-grid">
             </div>
+    </main>
+
+    <div id="profileModal" class="modal">
+        <div class="liquid-glass-modal">
+            <div id="authSection">
+                <h2>Kirish</h2>
+                <p>Botga yuborgan raqamingizni kiriting:</p>
+                <input type="text" id="userPhoneInput" placeholder="+998901234567" class="glass-input">
+                <button class="action-btn" onclick="loginUser()">Tasdiqlash</button>
+            </div>
+
+            <div id="profileSection" style="display: none;">
+                <h2 id="welcomeUser">Xush kelibsiz!</h2>
+                <div class="promo-card">
+                    <h3>🎁 Mening Promokodlarim</h3>
+                    <div id="promoList" class="promo-list">
+                        </div>
+                </div>
+                <button class="danger-btn" onclick="logout()">Chiqish</button>
+            </div>
+            <button class="close-btn" onclick="toggleProfile()">Yopish</button>
         </div>
-    </section>
-
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>Davlat</th>
-                    <th>Raqam</th>
-                    <th>Holati</th>
-                    <th>Narxi</th>
-                    <th>Sotib olish</th>
-                </tr>
-            </thead>
-            <tbody id="dataTable">
-                </tbody>
-        </table>
     </div>
-</div>
 
-<div class="footer-bot">@RenoxNumbersBot</div>
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
